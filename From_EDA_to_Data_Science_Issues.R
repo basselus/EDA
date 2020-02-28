@@ -42,6 +42,11 @@ data(heart_disease)
 
 
 #***************************************************************************
+#*************************** UNIVARIATE ANALYSIS ***************************
+#***************************************************************************
+
+
+#***************************************************************************
 #**** 1 - Checking missing values, zeros, data type, and unique values *****
 #***************************************************************************
 
@@ -94,6 +99,7 @@ df_status(heart_disease)
 #*********************** 4 - Getting to know the data***********************
 #***************************************************************************    
   
+  describe(heart_disease)
   dim(heart_disease)
   colnames(heart_disease)  
   glimpse(heart_disease)  
@@ -136,6 +142,9 @@ df_status(heart_disease)
   data_world=read.csv(file = "https://goo.gl/2TrDgN", header = T, stringsAsFactors = F, na.strings = ".." )
   
   # Excluding missing values in Series.Code. The data downloaded from the web page contains four lines with "free-text" at the bottom of the file.
+  
+  vides = which(data_world$Series.Code %in% c(""))
+  subset_example = subset(data_world, data_world$Series.Code=="", c(1,3))
   data_world=filter(data_world, Series.Code!="")
   
   
@@ -205,6 +214,39 @@ df_status(heart_disease)
   describe(data_subset)
   
   
+  profiling_num(data_subset)
+  profiling_num(data_world_wide)
   
   
+  #To avoid printing all the results we can make use a select filter from dplyr
   
+  profiling_table = profiling_num(data_world_wide) %>% select(variable, mean, p_01, p_99, range_80)
+  profiling_table  
+
+  
+  # PROFILING NUMERICAL VARIABLES BY PLOTTING
+  
+  plot_num(data_subset)
+  plot_num(data_world_wide)
+  
+  # Adjusting the number of bars using bins parameter
+  
+  plot_num(data_world_wide , bins = 20)
+  
+  
+  #***************************************************************************
+  #*************************** MULTIVARIATE ANALYSIS *************************
+  #***************************************************************************
+  
+  
+  libs = c("minerva","ggplot2","gridExtra","scipen=999")
+  
+  package_check <- lapply(packages, FUN = function(x){
+    
+    if (!require(x, character.only=T)) {
+      
+      install.packages(x, dependencies = T)  
+      library(x, character.only=T)
+    }
+    
+  })
