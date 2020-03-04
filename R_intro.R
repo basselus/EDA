@@ -361,6 +361,54 @@ s3
 # LES DATA FRAMES
 #*****************************************
 
+# Création d'un dataframe
+
+df = data.frame(age, sexe)
+
+# dimensions : nombre de lignes et de colonnes
+dim(df)
+
+# noms des variables 
+names(df)
+colnames(df)
+
+
+# numéros d'observations
+rownames(df)
+
+
+# structure du dataframe : description du types de variables présentes
+str(df)
+
+# indexation de variables
+df$age
+
+# ajout de variables 
+df$var1 <- 1:10
+head(df, 4)
+df[1:4,]
+df$opinion= opinion
+str(df)
+
+# Suppression de variables
+d[,3] <- NULL
+d[1:3,]
+
+# résumé détaillé de la distribution des variables
+summary(df)
+
+
+#*****************************************
+#************ IMPORT DE DONNEES **********
+#*****************************************
+
+# fonctions read.table, read.csv et read.csv2
+
+fic1 <- read.csv("fic1.csv", header = T,  sep = ";", na.strings ="NA", dec = "," ,strip.white= T)
+fic2 <- read.csv("fic1.csv", header = T,  sep = ";", na.strings ="NA", dec = "," ,strip.white= T)
+fic3 <- read.csv("fic1.csv", header = T,  sep = ";", na.strings ="NA", dec = "," ,strip.white= T)
+
+
 #*****************************************
 # Les sous populations : fonctions subsets
 #*****************************************
