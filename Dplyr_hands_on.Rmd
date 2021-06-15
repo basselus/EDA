@@ -1,74 +1,75 @@
 ---
-title: "EDA with dplyr"
+title: "Exploratory data analysis with dplyr"
 author: "Moussa BASSEL"
 date: "06/02/2021"
 output: html_document
 ---
 
-1 - Load libraries
+Note : to display results you need to remove the "message=FALSE" option in the chunks below
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
 
+## 1 - Load Libraries
+
+```{r, warning=FALSE, message=FALSE}
 library(dplyr)
 library(hflights)
 
 
 ```
 
-2 - View dataset
+## 2 - View dataset
 
-```{r results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 data("hflights")
 head(hflights, 5)
 ```
 
-##### 3 - Convert to local Dataframe
+## 3 - Convert to local Dataframe
+ 
+we use tbl_df, which is a wrapper to display data more convenientlty and prints information on unseen variables
 
-we use tbl_df, which is a wrapper to display data more convenientlty and prints information about not seen variables
-
-``````{r results='hide'}
-
+``````{r, warning=FALSE, message=FALSE, results='hide'}
 flights = as_tibble(hflights)
-flights
+head(flights,4)
 ```
 
+## 4 - Inspect the data
 
-``````{r results='hide'}
+  specify the number of rows you want to see
 
-# specify the number of rows you want to see
-print(flights, n=20)
+``````{r, warning=FALSE, message=FALSE,results='hide'}
+
+print(flights, n=5)
 
 ```
 
-``````{r results='hide'}
-
+``````{r, warning=FALSE, message=FALSE, results='hide'}
 head(flights, 5)
 ```
 
-## Filtering
+## 5 - Filtering
 
-```{r results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Rbase approach
 flights[flights$Month == 1 & flights$DayOfWeek == 7, c(1:4)]
 
-#dplyr approach
-filter(flights, Month==1, DayofMonth ==2)
+# dplyr approach
+filter(slice(flights, 1:5), Month==1, DayofMonth ==2)
 
-#using pipe and %in% operators
-filter(flights, ActualElapsedTime == 60 | ActualElapsedTime ==70)
+# using pipe and %in% operators
+filter(slice(flights, 1:5), ActualElapsedTime == 60 | ActualElapsedTime ==70)
+
 filter(flights, TailNum %in% c("N576AA"), Dest %in% c("DFW"))
-
 ```
 
-## Selecting
+## 6 - Selecting
 
-```{r results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 #Base R approach
 flights[c(1:5), c("FlightNum","AirTime","TaxiOut")]
 ```
 
-```{r results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Dplyr approach
 select(flights, FlightNum,AirTime, TaxiOut)
 select(flights, AirTime:Dest, contains('taxi'), contains('cancel'))
@@ -78,16 +79,16 @@ select(flights, contains('taxi'), contains('cancel'))
 
 ```
 
-## Slice
+## 7 - Slicing
 
-```{r results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 slice(flights, 1:5)
 ```
 
 
-## Chaining and pipelining
+## 8 - Chaining and pipelining
 
-```{r results='hide'}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 filter(select(flights, UniqueCarrier, TailNum, TaxiIn), TaxiIn > 10)
 
 # alternative way : chaining
@@ -97,40 +98,46 @@ flights %>%
 
 ```
 
-```{r}
-# Chaining increases readability and can be used to replace nesting in R commands
+Chaining increases the readability and can be used to replace nesting in R commands
+
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # creating 2 vectors and calculate euclidian distance between them
 x = 1:5; y = 2:6
 sqrt(sum((x-y)^2))
 
-# chaining method
+# chaining method in practice
 (x-y)^2 %>% sum() %>% sqrt()
 
-
 ```
-## Arrange : reorder rows
 
-```{r}
+## 9- Arrange : reordering rows
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # baseR Approach (select UniqueCarrier and  DepDelay columns and sort by DepDelay )
 flights[order(flights$DepDelay), c("UniqueCarrier", "DepDelay")]
 ```
-```{r}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 #dplyr approach
 flights %>%
   select(UniqueCarrier,DepDelay)%>%
   arrange(DepDelay) # ascending by default
 ```
-```{r}
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
 
 # descending order
 flights %>%
   select(UniqueCarrier,DepDelay)%>%
   arrange(desc(DepDelay))
 ```
-## Mutate (adding new variables)
 
-```{r}
-# create new variables that are functions of existing variables
+## 10 - Mutate (adding new variables)
+
+```{r, warning=FALSE, message=FALSE, results='hide'}
+# create new variables that are functions of existing variables :
+
 # rbase approach
 flights$Speed = flights$Distance / flights$AirTime*60
 flights[, c("Distance", "AirTime", "Speed")]
@@ -150,10 +157,10 @@ head(flights, 5)
 ```
 
 
-## summarise and group_by
+## 11 - Summarise and group_by
 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # calculate average arrival delay for each destination
 # Rbase Approach
 head(aggregate(ArrDelay ~ Dest, flights, mean))
@@ -161,7 +168,7 @@ head(with(flights, tapply(ArrDelay, Dest, mean, na.rm=TRUE)))
 
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Dplyr Approach
 # we create a table of destinations and summarise each group by taking the mean ArrDelay
 flights %>%
@@ -169,9 +176,9 @@ flights %>%
   summarise(avg_delay=mean(ArrDelay, na.rm = TRUE))
 ```
 
-# Summarise_each 
+## 12 - Summarise_each 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # applies the same summmry function as above to multiple columns 
 # Calculating for each UniqueCarrier the percentage of flights cancelled or diverted (for each = group by)
 
@@ -180,30 +187,26 @@ flights %>%
   summarise_each(funs(mean),Cancelled, Diverted)
 
 # Calculate for each Carrier the maximum and minimum arrival and departure delays
-
-
 flights %>%
   group_by(UniqueCarrier) %>%
   summarise_each(funs(min(., na.rm = TRUE), max( na.rm = TRUE)), matches("Delay"))
 
 ```
 
-#Helper functions
+## 13 - Helper functions
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 
 # n = counts the number of rows in a group
 # n_distinct(vector) = counts the number of unique items in that vector 
 
 # 1 - for each day of the year, count the total number of flights and sort in descending order
-
 flights %>%
   group_by(Month, DayofMonth) %>%
   summarise( flight_count = n()) %>%
   arrange(desc(flight_count))
   
 # 2 - use simpler Tally function (# nb : output => shows 365 days in a year)
-
 flights %>%
   group_by(Month, DayofMonth) %>%
   tally(sort = TRUE)
@@ -211,7 +214,6 @@ flights %>%
 
 
 # 3 - Show for each destination the total number of flights and the number of distinct planes that flew there
-
 flights %>%
   group_by(Dest) %>%
   summarise(flight_count = n(), plane_count = n_distinct(TailNum))
@@ -219,12 +221,11 @@ flights %>%
 ```
 
 
-# More on Grouping
+## 14 - More on Grouping
 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Show the number of Cancelled and Not Cancelled flights
-
 flights %>%
   group_by(Dest) %>%
   select(Cancelled) %>%
@@ -235,13 +236,12 @@ flights %>%
 ```
 
 
-# Window functions
+## 15 - Window functions
 
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # fore each Carrier calculate which 2 days of the year they had their longest departure delay
 # Note : the ranking function puts the smallest value at first position. So we use the desc function to rank by largest value
-
 flights %>%
   group_by(UniqueCarrier) %>%
   select(Month, DayofMonth, DepDelay) %>%
@@ -250,9 +250,8 @@ flights %>%
 
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # Same thing with the top_n function above
-
 flights %>%
   group_by(UniqueCarrier) %>%
   select(Month, DayofMonth, DepDelay) %>%
@@ -261,14 +260,12 @@ flights %>%
 
 
 # calculate for each month the total number of flights and the change versus previous month
-
 flights %>%
   group_by(Month) %>%
   summarise(flight_count = n()) %>%
   mutate(change = flight_count - lag(flight_count)) # lag function looks at the earlier value
 
 # simpler with tally function
-
 flights %>%
   group_by(Month) %>%
   tally() %>%
@@ -278,15 +275,13 @@ flights %>%
 
 ```
 
-# More usefule functions
+## 16 - More useful functions
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 # random sample of a fixed number of rows without replacement
-
 flights %>% sample_n(5)
 
 # same as above with replacement but chosing a fraction of rows
-
 flights %>% sample_frac(0.25, replace = TRUE)
 
 # look at the structure of an object (base R approach)
